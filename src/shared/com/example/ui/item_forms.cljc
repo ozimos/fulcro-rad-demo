@@ -1,15 +1,15 @@
 (ns com.example.ui.item-forms
   (:require
-    [com.example.model.item :as item]
-    [com.fulcrologic.rad.picker-options :as picker-options]
-    [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
-    [com.fulcrologic.rad.control :as control]
-    [com.fulcrologic.rad.form :as form]
-    [com.fulcrologic.rad.form-options :as fo]
-    [com.fulcrologic.rad.report :as report]
-    [com.fulcrologic.rad.report-options :as ro]
-    [taoensso.timbre :as log]
-    [com.example.model.category :as category]))
+   [com.example.model.item :as item]
+   [com.fulcrologic.rad.picker-options :as picker-options]
+   [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
+   [com.fulcrologic.rad.control :as control]
+   [com.fulcrologic.rad.form :as form]
+   [com.fulcrologic.rad.form-options :as fo]
+   [com.fulcrologic.rad.report :as report]
+   [com.fulcrologic.rad.report-options :as ro]
+   [taoensso.timbre :as log]
+   [com.example.model.category :as category]))
 
 (defsc CategoryQuery [_ _]
   {:query [:category/id :category/label]
@@ -22,27 +22,26 @@
                      item/description
                      item/in-stock
                      item/min-level
-                     item/location
+                     item/locations
                      item/price]
    fo/field-styles  {:item/category :pick-one}
    fo/field-options {:item/category {::picker-options/query-key       :category/all-categories
                                      ::picker-options/query-component CategoryQuery
                                      ::picker-options/options-xform   (fn [_ options] (mapv
-                                                                                        (fn [{:category/keys [id label]}]
-                                                                                          {:text (str label) :value [:category/id id]})
-                                                                                        (sort-by :category/label options)))
-                                     ::picker-options/cache-time-ms   30000}}
+                                                                                       (fn [{:category/keys [id label]}]
+                                                                                         {:text (str label) :value [:category/id id]})
+                                                                                       (sort-by :category/label options)))
+                                     ::picker-options/cache-time-ms   30000}
+                     :item/locations {:label "Shelf Locations"}}
    fo/route-prefix  "item"
    fo/title         "Edit Item"})
 
-(comment
-  (macroexpand '(form/defsc-form ItemizedForm  [this props] {fo/id item/id}))
-  )
+
 (report/defsc-report InventoryReport [this props]
   {ro/title               "Inventory Report"
    ro/source-attribute    :item/all-items
    ro/row-pk              item/id
-   ro/columns             [item/item-name category/label item/price item/in-stock item/min-level item/location]
+   ro/columns             [item/item-name category/label item/price item/in-stock item/min-level item/locations]
 
    ro/row-visible?        (fn [filter-parameters row] (let [{::keys [category]} filter-parameters
                                                             row-category (get row :category/label)]
@@ -60,10 +59,10 @@
                                        picker-options/query-component category/Category
                                        picker-options/options-xform   (fn [_ categories]
                                                                         (into [{:text "All" :value ""}]
-                                                                          (map
-                                                                            (fn [{:category/keys [label]}]
-                                                                              {:text label :value label}))
-                                                                          categories))}}
+                                                                              (map
+                                                                               (fn [{:category/keys [label]}]
+                                                                                 {:text label :value label}))
+                                                                              categories))}}
 
    ;; If defined: sort is applied to rows after filtering (client-side)
    ro/initial-sort-params {:sort-by          :item/name

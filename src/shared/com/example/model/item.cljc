@@ -2,6 +2,8 @@
   (:require
     [com.fulcrologic.rad.attributes :as attr :refer [defattr]]
     [com.fulcrologic.rad.attributes-options :as ao]
+    [com.fulcrologic.rad.report-options :as ro]
+   [com.fulcrologic.rad.form-options :as fo]
     [com.wsscode.pathom3.connect.operation :as pco]
     [com.wsscode.pathom3.interface.eql :as p.eql]
     #?(:clj [com.example.components.database-queries :as queries])
@@ -37,8 +39,10 @@
   {ao/identities #{:item/id}
    ao/schema     :production})
 
-(defattr location :item/location :string
+(defattr locations :item/locations :string
   {ao/identities #{:item/id}
+   ro/column-heading "Shelf Locations"
+   fo/field-label "Shelf Locations"
    ao/style :tag
    ao/schema     :production})
 
@@ -56,7 +60,7 @@
      (let [result (p.eql/process env [{[:item/id id] [{:item/category [:category/id :category/label]}]}])]
        (get-in result [[:item/id id] :item/category]))))
 
-(def attributes [id item-name category description price in-stock min-level location all-items])
+(def attributes [id item-name category description price in-stock min-level locations all-items])
 
 #?(:clj
    (def resolvers [item-category-resolver]))
